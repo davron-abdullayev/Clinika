@@ -5,15 +5,15 @@ from app.schemas.patientsm import PatientCreateSchemas,PatientUpdateSchemas
 from app.models.patient import Patient
 from app.models import db
 from pydantic import BaseModel,Field
-from app.routes.decorators import rol_required
-from flask_bcrypt import generate_password_hash,check_password_hash
+from app.routes.decorators import role_required
+from flask_jwt_extended import create_access_token,jwt_required,get_jwt_identity
 
 patient_bp=Blueprint('patients',__name__,url_prefix='/patients')
 
 class PatientResource(Resource):
 
     def get(self,patient_id):
-        patient=Patient.query.filter_by(id=patient_id).first()
+        patient=Patient.query.filter_by(id=patient_id,patient_id=int(get_jwt_identity())).first()
         if patient is None:
             return {"message":"Bunday idli patient mavjud emas"},404
         return {
@@ -26,7 +26,7 @@ class PatientResource(Resource):
                 },200
 
     def delete(self,patient_id):
-        patient=Patient.query.filter_by(id=patient_id).first()
+        patient=Patient.query.filter_by(id=patient_id,patient_id=int(get_jwt_identity())).first()
         if patient is None:
             return {"message":"Bunday idli patient mavjud emas"},404
         db.session.delete(patient)
@@ -37,7 +37,7 @@ class PatientResource(Resource):
         try:
             data=PatientUpdateSchemas.model_validate(request.get_json())
             
-            patient=Patient.query.filter_by(id=patient_id).first()
+            patient=Patient.query.filter_by(id=patient_id,patient_id=int(get_jwt_identity())).first()
             if patient is None:
                 return {"message":"Bunday idli patient mavjud emas"},404
             if data.phone is not None:
@@ -56,7 +56,7 @@ class PatientResource(Resource):
         try:
             data=PatientUpdateSchemas.model_validate(request.get_json())
             
-            patient=Patient.query.filter_by(id=patient_id).first()
+            patient=Patient.query.filter_by(id=patient_id,patient_id=int(get_jwt_identity())).first()
             if patient is None:
                 return {"message":"Bunday idli patient mavjud emas"},404
             
@@ -73,14 +73,14 @@ class PatientResource(Resource):
         return {"message":"Patient muvaffaqiyatli tuliq yangilandi","patient":patient._dict()},200
 
 class PatientCreateResource(Resource):
-    @rol_required(['admin'])
+    @role_required(['admin'])
 
     def get(self):
-        patients=Patient.query.all()
+        patients=Patient.query.filter_by(patient_id=int(get_jwt_identity())).all()
         return({
             "patients":[patient._dict() for patient in patients]},200)
 
-    @rol_required(['admin'])
+    @role_required(['admin'])
     def post(self):
         try:
             data=PatientCreateSchemas.model_validate(request.get_json())

@@ -4,10 +4,10 @@ from .routes import register_bp
 import logging
 from logging.handlers import RotatingFileHandler
 from app.routes.auth import auth_bp
-from app.resources.main import UserCreateResource,UserResource
-from app.resources.doctor import DoctorCreateResource,DoctorResource
+from app.resources.user import UserCreateResource,UserResource
+from app.resources.doctor import DoctorCreateResource,DoctorResource,DoctorAdminCreateResource,DoctorAdminResource
 from app.resources.patient import PatientCreateResource,PatientResource
-from app.resources.schedule import ScheduleCreateResource,ScheduleResource
+from app.resources.schedule import ScheduleCreateResource,ScheduleResource,ScheduleAdminCreateResource,ScheduleAdminResource
 from app.resources.appointment import AppointmentCreateResource,AppointmentResource
 from flask_jwt_extended import create_access_token,get_jwt_identity,jwt_required
 
@@ -45,7 +45,28 @@ def create_app():
 
     api=Api(app)
 
+    api.add_resource(UserCreateResource,"/users/")
+    api.add_resource(UserResource,"/users/<int:user_id>")
+
+    api.add_resource(PatientCreateResource,"/patients/")
+    api.add_resource(PatientResource,"/patients/<int:patient_id>")
+
+    api.add_resource(DoctorCreateResource,"/doctors/")
+    api.add_resource(DoctorResource,"/doctors/<int:doctor_id>")
+
+    api.add_resource(DoctorAdminCreateResource,"/admin/doctors/")
+    api.add_resource(DoctorAdminResource,"/admin/doctors/<int:doctor_id>")
+
+    api.add_resource(ScheduleCreateResource,"/schedules/")
+    api.add_resource(ScheduleResource,"/schedules/<int:schedule_id>")
     
+    api.add_resource(ScheduleAdminCreateResource,"/admin/schedules/")
+    api.add_resource(ScheduleAdminResource,"/admin/schedules/<int:schedule_id>")
+
+    api.add_resource(AppointmentCreateResource,"/appointments/")
+    api.add_resource(AppointmentResource,"/appointments/<int:appointment_id>")
+    
+
 
 
     app.config['SECRET_KEY']='jdjhgjchmdsbxjmchb'

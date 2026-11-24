@@ -4,7 +4,7 @@ from flask_jwt_extended import get_jwt_identity,jwt_required
 
 from app.models import User
 
-def rol_required(role_list:list):
+def role_required(role_list:list):
     def decorator(func):
         @jwt_required()
         @wraps(func)

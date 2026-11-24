@@ -5,7 +5,8 @@ from app.schemas.appointmentsxm import AppointmentCreateSchemas,AppointmentUpdat
 from app.models.appointment import Appointment
 from app.models import db
 from pydantic import BaseModel,Field
-from app.routes.decorators import rol_required
+from app.routes.decorators import role_required
+from flask_jwt_extended import create_access_token,jwt_required,get_jwt_identity
 
 
 appointment_bp=Blueprint('appointments',__name__,url_prefix='/appointments')
@@ -13,7 +14,7 @@ appointment_bp=Blueprint('appointments',__name__,url_prefix='/appointments')
 class AppointmentResource(Resource):
 
     def get(self,appointment_id):
-        appointment=Appointment.query.filter_by(id=appointment_id).first()
+        appointment=Appointment.query.filter_by(id=appointment_id,appointment_id=int(get_jwt_identity())).first()
         if appointment is None:
             return {"message":"Bunday idli appointment mavjud emas"},404
         return {
@@ -29,7 +30,7 @@ class AppointmentResource(Resource):
 
 
     def delete(self,appointment_id):
-            appointment=Appointment.query.filter_by(id=appointment_id).first()
+            appointment=Appointment.query.filter_by(id=appointment_id,appointment_id=int(get_jwt_identity())).first()
             if appointment is None:
                 return {"message":"Bunday idli appointment mavjud emas"},404
             db.session.delete(appointment)
@@ -40,7 +41,7 @@ class AppointmentResource(Resource):
         try:
             data=AppointmentUpdateSchemas.model_validate(request.get_json())
             
-            appointment=Appointment.query.filter_by(id=appointment_id).first()
+            appointment=Appointment.query.filter_by(id=appointment_id,appointment_id=int(get_jwt_identity())).first()
             if appointment is None:
                 return {"message":"Bunday idli appointment mavjud emas"},404
             if data.date is not None:
@@ -64,7 +65,7 @@ class AppointmentResource(Resource):
         try:
             data=AppointmentUpdateSchemas.model_validate(request.get_json())
             
-            appointment=Appointment.query.filter_by(id=appointment_id).first()
+            appointment=Appointment.query.filter_by(id=appointment_id,appointment_id=int(get_jwt_identity())).first()
             if appointment is None:
                 return {"message":"Bunday idli appointment mavjud emas"},404
             
@@ -81,14 +82,14 @@ class AppointmentResource(Resource):
         return {"message":"appointment muvaffaqiyatli tuliq yangilandi","appointment":appointment._dict()},200
 
 class AppointmentCreateResource(Resource):
-    @rol_required(['admin'])
+    @role_required(['admin'])
 
     def get(self):
-        appointments=Appointment.query.all()
+        appointments=Appointment.query.filter_by(appointment_id=int(get_jwt_identity())).all()
         return({
             "appointment":[appointment._dict() for appointment in appointments]},200)
 
-    @rol_required(['admin'])
+    @role_required(['admin'])
     def post(self):
         try:
             data=AppointmentCreateSchemas.model_validate(request.get_json())

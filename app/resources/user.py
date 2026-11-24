@@ -6,7 +6,7 @@ from app.schemas.usersxm import UserCreateSchemas,UserUpdateSchemas
 from app.models.user import User
 from app.models import db
 from pydantic import BaseModel,Field
-from app.routes.decorators import rol_required
+from app.routes.decorators import role_required
 from flask_bcrypt import generate_password_hash,check_password_hash
 
 
@@ -69,14 +69,14 @@ class UserResource(Resource):
         return {"message":"User muvaffaqiyatli tuliq yangilandi","user":user._dict()},200
     
 class UserCreateResource(Resource):
-    @rol_required(['admin'])
+    @role_required(['admin'])
 
     def get(self):
         users=User.query.all()
         return({
             "users":[user._dict() for user in users]},200)
 
-    @rol_required(['admin'])
+    @role_required(['admin'])
     def post(self):
         try:
             data=UserCreateSchemas.model_validate(request.get_json())
