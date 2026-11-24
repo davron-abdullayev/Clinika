@@ -3,6 +3,12 @@ from flask_restful import Api
 from .routes import register_bp
 import logging
 from logging.handlers import RotatingFileHandler
+from app.routes.auth import auth_bp
+from app.resources.main import UserCreateResource,UserResource
+from app.resources.doctor import DoctorCreateResource,DoctorResource
+from app.resources.patient import PatientCreateResource,PatientResource
+from app.resources.schedule import ScheduleCreateResource,ScheduleResource
+from app.resources.appointment import AppointmentCreateResource,AppointmentResource
 from flask_jwt_extended import create_access_token,get_jwt_identity,jwt_required
 
 
@@ -38,6 +44,8 @@ def create_app():
         return get_error("Page not found",None,404)
 
     api=Api(app)
+
+    
 
 
     app.config['SECRET_KEY']='jdjhgjchmdsbxjmchb'

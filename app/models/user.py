@@ -20,15 +20,19 @@ class User(db.Model):
     id:Mapped[int]=mapped_column(BigInteger(),primary_key=True)
     full_name:Mapped[str]=mapped_column(String(100),nullable=False)
     username:Mapped[str]=mapped_column(String(100),unique=True,nullable=False)
-    password:Mapped[int]=mapped_column(String(255),nullable=False)
+    password:Mapped[str]=mapped_column(String(255),nullable=False)
     role:Mapped[UserRole]=mapped_column(SQLEnum(UserRole),default=UserRole.PATIENT,nullable=False)
     created_at:Mapped[datetime]=mapped_column(DateTime(),default=datetime.now)
+
+    doctor: Mapped['Doctor'] = relationship('Doctor', back_populates='user')
+    patient: Mapped['Patient'] = relationship('Patient', back_populates='user')
+
 
     def _dict(self):
             return{
                 "id":self.id,
                 "full_name":self.full_name,
                 "username":self.username,
-                "role":self.role
+                "role":self.role.value
 
             }

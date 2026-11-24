@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger,Boolean, Date, Integer,String, Text
+from sqlalchemy import BigInteger,Boolean, Date, ForeignKey, Integer,String, Text
 from sqlalchemy.orm import Mapped,mapped_column,relationship
 from datetime import datetime
 from sqlalchemy import DateTime
@@ -14,13 +14,17 @@ class Patient(db.Model):
     phone:Mapped[str]=mapped_column(String(20),nullable=False)
     birth_date:Mapped[Date]=mapped_column(Date,nullable=True)
     address:Mapped[str]=mapped_column(String(255),nullable=True)
-    user_id:Mapped["User"]=relationship(back_populates="patients")
+    user_id:Mapped[int]=mapped_column(ForeignKey("users.id"), nullable=False)
+
+    user:Mapped["User"]=relationship(back_populates="patient")
+    appointment:Mapped["Appointment"]=relationship(back_populates="patient")
+    
 
     def _dict(self):
             return{
                 "id":self.id,
                 "phone":self.phone,
-                "birth_date":self.birth_date,
+                "birth_date":str(self.birth_date),
                 "address":self.address
             }
 

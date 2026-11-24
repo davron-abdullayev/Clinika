@@ -14,5 +14,6 @@ from .user import User
 from .doctor import Doctor
 from .patient import Patient
 from .schedule import Schedule
+from .appointment import Appointment
 
 
